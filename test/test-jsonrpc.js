@@ -118,6 +118,7 @@ exports["testudp"] = function(assert, done) {
 
 exports["testmulticast"] = function(assert, done) {
     var config = require("../lib/config");
+    var consts = require("../lib/consts");
 
     var docli = function() {
 	protoapi.exec(function(id) {
@@ -146,8 +147,8 @@ exports["testmulticast"] = function(assert, done) {
 	}, { module : "proto", 
 	     submodule: "jsonrpc", 
 	     method : 'create', 
-	     params : [config.DISCOVERY_LOCAL_IP,
-		       config.DISCOVERY_LOCAL_PORT,
+	     params : [consts.DISCOVERY_IP,
+		       consts.DISCOVERY_PORT,
 		       false,"multicast"]}, manifest);	
     };
 
@@ -188,8 +189,8 @@ exports["testmulticast"] = function(assert, done) {
     }, { module : "proto", 
 	 submodule: "jsonrpc", 
 	 method : 'create', 
-	 params : [config.DISCOVERY_LOCAL_IP,
-		   config.DISCOVERY_LOCAL_PORT,
+	 params : [consts.DISCOVERY_IP,
+		   consts.DISCOVERY_PORT,
 		   true,
 		   "multicast"]}, manifest);
 };

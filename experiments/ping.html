@@ -1,0 +1,35 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Fathom Ping Test</title>
+
+  <!-- <link rel="stylesheet" href="css/styles.css?v=1.0"> -->
+</head>
+
+<body>
+  <script src="jquery-2.2.0.js"></script>
+  <script>
+  // console.log("spam");
+  var manifest = {
+    'description' : 'Fathom ping feature',
+    'api' : [
+      'system.*',
+    ],
+    'destinations' : ['www.google.com']
+  };
+
+  fathom.init(function(res) {
+    if (res.error)
+      throw "init failed: " + res.error;
+    fathom.system.doPing(function(res) {
+      if (res.error)
+        throw "ping failed: " + res.error;
+      var $div = $('<div>'+JSON.stringify(res)+'<div/>').appendTo('body');
+    }, "www.google.com", {count : 5});
+  }, manifest);
+  </script>
+</body>
+</html>

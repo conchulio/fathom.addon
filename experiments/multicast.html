@@ -1,0 +1,114 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Fathom Multicast Test</title>
+
+  <!-- <link rel="stylesheet" href="css/styles.css?v=1.0"> -->
+</head>
+
+<body>
+  <script src="jquery-2.2.0.js"></script>
+  <script>
+  var manifest = {
+    'description' : 'Start some random tools',
+    'api' : [
+      'tools.discovery',
+      'tools.remoteapi.*',
+      'system.*',
+    ],
+    'destinations' : ['www.google.com']
+  };
+
+  var deviceSet = new Set();
+  var localDiscoverySet = new Set();
+  var me;
+
+  function doFathomThings() {
+    console.log("Start fathom things");
+    fathom.init(function startFathom(res) {
+      console.log("Initialization suceeded")
+      if (res.error) {
+        throw "init failed: " + JSON.stringify(res.error);
+      }
+      fathom.tools.discovery(function(node, done) {
+        localDiscoverySet.add(node);
+        console.log(node)
+        if (done) {
+          me = Array.from(localDiscoverySet)[0];
+          me.address = me.ipv4;
+          fathom.tools.remoteapi.start(function startRemote(node,done) {
+            console.log('started remoteapi!');
+            discoveryDone = false;
+            fathom.tools.remoteapi.discovery(function discoverRemote(node,done) {
+              if (Object.keys(node).length > 0) {
+                deviceSet.add(node);
+              }
+              console.log('started discovery');
+              console.log(node);
+              if (done) {
+                console.log("discovered everything");
+                var allNodes = Array.from(deviceSet);
+                console.log(allNodes);
+                // TODO: Count how many nodes there are. For each execute a ping.
+                // Maybe I have to use some advanced closure magic for that. 
+                // Display everything in a fancy graph. 
+                // Do other measurements, ask the router, do correlations.
+                // Tell the user what the problem is. 
+                var finishedNodes = 0;
+                allNodes.forEach(function(currentNode) {
+                  fathom.tools.remoteapi.makereq(function gotResponse(res, done) {
+                    if (done && res.timeout) {
+                      console.log("Connection terminated by remote host")
+                      return;
+                    }
+                    console.log("Oh my god, it succeeded!");
+                    if(!done) {
+                      finishedNodes += 1;
+                    }
+                    console.log(res);
+                    console.log(done);
+                    console.log("currentNode", currentNode)
+                    console.log(currentNode)
+                    if (finishedNodes == allNodes.length) {
+                      console.log("Asked every node");
+                    }
+                  }, currentNode, 'system.doPing', ["www.google.com", {count : 5}]);
+                });
+              }
+            }, 1/*s*/);
+          });
+        }
+      }, ['local'])
+    }, manifest);
+  }
+
+  doFathomThings();
+
+  </script>
+</body>
+</html>
+
+<!-- 
+    protoapi.exec(function(res) {
+  console.log(res);
+  assert.ok(res.error === undefined, "jsonrpc.makereq no error");
+  assert.ok(res.result === "pong", "jsonrpc.makereq got pong");
+
+  protoapi.exec(function(res) {
+      assert.ok(res.error === undefined, 
+          "jsonrpc.close no error");
+      done();
+
+  }, { module : "proto", 
+       submodule: "jsonrpc", 
+       method : 'close', 
+       params : [id]}, manifest);
+
+    }, { module : "proto", 
+   submodule: "jsonrpc", 
+   method : 'makereq', 
+   params : [id,"ping"]}, manifest);
+ -->

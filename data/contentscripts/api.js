@@ -1570,7 +1570,9 @@ tools.dnsLookup = function(callback, hostname, server, port) {
 tools.discovery = function(callback, protocols, timeout) {
     makereq(callback, "tools", "discovery", [protocols, timeout]);
 };
-tools.discovery.addononly = true;
+console.warn("Warning: discovery available to anyone!");
+tools.discovery.addononly = false;
+// tools.discovery.addononly = true;
 
 /**
  * @description Resolve the nearest Mlab server.
@@ -1591,7 +1593,9 @@ tools.getMlabServer = function(callback) {
  * @access private
  * @exports fathom/tools/remoteapi
  */
-var remoteapi = tools.remoteapi = { addononly : true };
+console.warn("Warning: remoteapi available to anyone!");
+var remoteapi = tools.remoteapi = { addononly : false };
+// var remoteapi = tools.remoteapi = { addononly : true };
 
 /**
  * @description Start remote API servers (sets the browser visible to other 
@@ -1604,6 +1608,7 @@ remoteapi.start = function(callback) {
     makereq(callback, "tools.remoteapi", "start", []);
 };
 remoteapi.start.addononly = true;
+// remoteapi.start.addononly = false;
 
 /**
  * @description Stop remote API servers (unless somebody else is using it).
@@ -1613,6 +1618,7 @@ remoteapi.stop = function(callback) {
     makereq(callback, "tools.remoteapi", "stop", []);
 };
 remoteapi.stop.addononly = true;
+// remoteapi.stop.addononly = false;
 
 /**
  * @description Discover other nodes running Fathom (i.e. nodes that have 
@@ -1626,6 +1632,7 @@ remoteapi.discovery = function(callback, timeout) {
     makereq(callback, "tools.remoteapi", "discovery", [timeout]);
 };
 remoteapi.discovery.addononly = true;
+// remoteapi.discovery.addononly = false;
 
 /**
  * @description Make remote API requests to other nodes running Fathom.
