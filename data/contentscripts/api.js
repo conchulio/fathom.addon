@@ -1644,8 +1644,8 @@ remoteapi.discovery.addononly = true;
  *                          available subject to the page manifest).
  * @param {Array} params    The parameters for the API call.
  */
-remoteapi.makereq = function(callback, node, method, params) {
-    makereq(callback, "tools.remoteapi", "makereq", [node,method,params]);
+remoteapi.makereq = function(callback, node, method, params, timeout) {
+    makereq(callback, "tools.remoteapi", "makereq", [node,method,params,timeout]);
 };
 remoteapi.makereq.addononly = true;
 

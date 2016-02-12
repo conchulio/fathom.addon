@@ -128,10 +128,10 @@
           if (done) {
             me = Array.from(localDiscoverySet)[0]
             me.address = me.ipv4
-            fathom.tools.remoteapi.start(function startRemote(node,done) {
+            fathom.tools.remoteapi.start(function (node,done) {
               console.log('started remoteapi!')
               discoveryDone = false
-              fathom.tools.remoteapi.discovery(function discoverRemote(node,done) {
+              fathom.tools.remoteapi.discovery(function (node,done) {
                 if (Object.keys(node).length > 0) {
                   deviceSet.add(node)
                 }
@@ -158,44 +158,41 @@
                     // console.log('method', method)
                     // console.log('params', params)
                     // var timer = index*1000
-                    var timer = 0
-                    console.log('timer', JSON.stringify(timer))
                     // if (index === 0) {
                     //   return
                     // }
-                    setTimeout(function(){
-                      allNodes.forEach(function(currentNode) {
-                        console.log('argsForEachNode',JSON.stringify(args))
-                        console.log('indexForEachNode',JSON.stringify(index))
-                        fathom.tools.remoteapi.makereq(function gotResponse(fullResult, done) {
-                          if (done && fullResult.timeout) {
-                            console.log("Connection terminated by remote host")
-                            return
-                          }
-                          // if (args[0] !== 'system.doTraceroute' && index !== 0) {
-                          //   return
-                          // }
-                          console.log('currentNode', JSON.stringify(currentNode))
-                          console.log("index", JSON.stringify(index))
-                          console.log("allNodes.indexOf(currentNode)", JSON.stringify(allNodes.indexOf(currentNode)))
-                          console.log('method', JSON.stringify(args[0]))
-                          console.log('params', JSON.stringify(args[1]))
-                          resultsArray[index][allNodes.indexOf(currentNode)] = fullResult
-                          console.log('resultsArray', JSON.stringify(resultsArray))
-                          if(!done) {
-                            eachCounter[index] += 1
-                          }
-                          console.log('eachCounter',JSON.stringify(eachCounter))
-                          // console.log(res)
-                          // console.log(done)
-                          // console.log("currentNode", currentNode)
-                          if (eachCounter[index] == allNodes.length) {
-                            createTable(resultsArray[index],args[0])
-                            console.log("Asked every node for index", index)
-                          }                               // timeout of 100s
-                        }, currentNode, args[0], args[1], 100)
-                      })
-                    },timer)
+                    allNodes.forEach(function(currentNode) {
+                      console.log('argsForEachNode',JSON.stringify(args))
+                      console.log('indexForEachNode',JSON.stringify(index))
+                      fathom.tools.remoteapi.makereq(function(fullResult, done) {
+                        console.log('fullResult', fullResult);
+                        if (done && fullResult.timeout) {
+                          console.log("Connection terminated by remote host")
+                          return
+                        }
+                        // if (args[0] !== 'system.doTraceroute' && index !== 0) {
+                        //   return
+                        // }
+                        console.log('currentNode', JSON.stringify(currentNode))
+                        console.log("index", JSON.stringify(index))
+                        console.log("allNodes.indexOf(currentNode)", JSON.stringify(allNodes.indexOf(currentNode)))
+                        console.log('method', JSON.stringify(args[0]))
+                        console.log('params', JSON.stringify(args[1]))
+                        resultsArray[index][allNodes.indexOf(currentNode)] = fullResult
+                        console.log('resultsArray', JSON.stringify(resultsArray))
+                        if(!done) {
+                          eachCounter[index] += 1
+                        }
+                        console.log('eachCounter',JSON.stringify(eachCounter))
+                        // console.log(res)
+                        // console.log(done)
+                        // console.log("currentNode", currentNode)
+                        if (eachCounter[index] == allNodes.length) {
+                          createTable(resultsArray[index],args[0])
+                          console.log("Asked every node for index", index)
+                        }                               // timeout of 100s
+                      }, currentNode, args[0], args[1], 100)
+                    })
                   })
                 }
               }, 1/*s*/)
@@ -210,25 +207,3 @@
   </script>
 </body>
 </html>
-
-<!-- 
-    protoapi.exec(function(res) {
-  console.log(res)
-  assert.ok(res.error === undefined, "jsonrpc.makereq no error")
-  assert.ok(res.result === "pong", "jsonrpc.makereq got pong")
-
-  protoapi.exec(function(res) {
-      assert.ok(res.error === undefined, 
-          "jsonrpc.close no error")
-      done()
-
-  }, { module : "proto", 
-       submodule: "jsonrpc", 
-       method : 'close', 
-       params : [id]}, manifest)
-
-    }, { module : "proto", 
-   submodule: "jsonrpc", 
-   method : 'makereq', 
-   params : [id,"ping"]}, manifest)
- -->
