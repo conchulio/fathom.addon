@@ -10,82 +10,202 @@
 </head>
 
 <body>
-  <script src="jquery-2.2.0.js"></script>
+
+  <div class="results"></div>
+
+  <!-- <script src="jquery-2.2.0.js"></script> -->
   <script>
-  var manifest = {
-    'description' : 'Start some random tools',
-    'api' : [
-      'tools.discovery',
-      'tools.remoteapi.*',
-      'system.*',
-    ],
-    'destinations' : ['www.google.com']
-  };
-
-  var deviceSet = new Set();
-  var localDiscoverySet = new Set();
-  var me;
-
-  function doFathomThings() {
-    console.log("Start fathom things");
-    fathom.init(function startFathom(res) {
-      console.log("Initialization suceeded")
-      if (res.error) {
-        throw "init failed: " + JSON.stringify(res.error);
-      }
-      fathom.tools.discovery(function(node, done) {
-        localDiscoverySet.add(node);
-        console.log(node)
-        if (done) {
-          me = Array.from(localDiscoverySet)[0];
-          me.address = me.ipv4;
-          fathom.tools.remoteapi.start(function startRemote(node,done) {
-            console.log('started remoteapi!');
-            discoveryDone = false;
-            fathom.tools.remoteapi.discovery(function discoverRemote(node,done) {
-              if (Object.keys(node).length > 0) {
-                deviceSet.add(node);
-              }
-              console.log('started discovery');
-              console.log(node);
-              if (done) {
-                console.log("discovered everything");
-                var allNodes = Array.from(deviceSet);
-                console.log(allNodes);
-                // TODO: Count how many nodes there are. For each execute a ping.
-                // Maybe I have to use some advanced closure magic for that. 
-                // Display everything in a fancy graph. 
-                // Do other measurements, ask the router, do correlations.
-                // Tell the user what the problem is. 
-                var finishedNodes = 0;
-                allNodes.forEach(function(currentNode) {
-                  fathom.tools.remoteapi.makereq(function gotResponse(res, done) {
-                    if (done && res.timeout) {
-                      console.log("Connection terminated by remote host")
-                      return;
-                    }
-                    console.log("Oh my god, it succeeded!");
-                    if(!done) {
-                      finishedNodes += 1;
-                    }
-                    console.log(res);
-                    console.log(done);
-                    console.log("currentNode", currentNode)
-                    console.log(currentNode)
-                    if (finishedNodes == allNodes.length) {
-                      console.log("Asked every node");
-                    }
-                  }, currentNode, 'system.doPing', ["www.google.com", {count : 5}]);
-                });
-              }
-            }, 1/*s*/);
-          });
+    var flattenObject = function(ob) {
+      var toReturn = {}
+      
+      for (var i in ob) {
+        if (!ob.hasOwnProperty(i)) continue
+        
+        if ((typeof ob[i]) == 'object') {
+          var flatObject = flattenObject(ob[i])
+          for (var x in flatObject) {
+            if (!flatObject.hasOwnProperty(x)) continue
+            
+            toReturn[x] = flatObject[x]
+          }
+        } else {
+          toReturn[i] = ob[i]
         }
-      }, ['local'])
-    }, manifest);
-  }
+      }
+      return toReturn
+    }
 
-  doFathomThings();
+    function removeResults() {
+      document.querySelector('.results').innerHTML = ''
+    }
+    function createTable(resultsArray,title) {
+      var newResults = []
+      for (var fullResultIndex in resultsArray) {
+        var fullResult = resultsArray[fullResultIndex]
+        var res = {}
+        var interestingAttributes = ['address','lost','mean','std_dev','median']
+        fullResult = flattenObject(fullResult)
+        for (var key in fullResult) {
+          value = fullResult[key]
+          if (typeof value === 'number') {
+            value = +value.toFixed(2)
+          }
+          // console.log('typeof value', ''+key+JSON.stringify(value)+(typeof value))
+          if (interestingAttributes.indexOf(key)>=0) {
+            res[key] = value
+          }
+        }
+        if (res.address === me.address) {
+          res.me = true
+        } else {
+          res.me = false
+        }
+        newResults[fullResultIndex] = res
+      }
+      resultsArray = newResults
+      var results = document.querySelector('.results')
+      var h1 = document.createElement('h1')
+      h1.appendChild(document.createTextNode(title))
+      results.appendChild(h1)
+      var tbl = document.createElement('table')
+      // tbl.style.width = '100%'
+      for (var i = 0; i < resultsArray.length+1; i++) {
+          var tr = document.createElement('tr')
+          var things
+          if (i===0) {
+            things = Object.keys(resultsArray[0])
+          } else {
+            // var address = resultsArray[i-1].address
+            // delete resultsArray[i-1].address
+            things = Object.keys(resultsArray[i-1]).map(function(item) {return JSON.stringify(resultsArray[i-1][item])})
+          }
+          for (var j = 0; j < things.length; j++) {
+            var td = document.createElement('td')
+            if (i === 0) {
+              var strong = document.createElement('strong')
+              strong.appendChild(document.createTextNode(things[j]))
+              td.appendChild(strong)
+            } else {
+              td.appendChild(document.createTextNode(things[j]))
+            }
+            tr.appendChild(td)
+          }
+          tbl.appendChild(tr)
+      }
+      results.appendChild(tbl)
+    }
+
+    var manifest = {
+      'description' : 'Start some random tools',
+      'api' : [
+        'tools.discovery',
+        'tools.getMlabServer',
+        'tools.remoteapi.*',
+        'system.*',
+      ],
+      'destinations' : ['ndt.iupui.mlab1.par01.measurement-lab.org']
+    }
+
+    var deviceSet = new Set()
+    var localDiscoverySet = new Set()
+    var me
+
+    function doFathomThings() {
+      console.log("Start fathom things")
+      fathom.init(function startFathom(res) {
+        document.querySelector(".results").innerHTML = "Initialized Fathom, processing..."
+        console.log("Initialization suceeded")
+        if (res.error) {
+          throw "init failed: " + JSON.stringify(res.error)
+        }
+        // fathom.tools.getMlabServer(function(res) {
+        //   console.log("mlab", res)
+        // })
+        removeResults()
+        fathom.tools.discovery(function(node, done) {
+          localDiscoverySet.add(node)
+          console.log(node)
+          if (done) {
+            me = Array.from(localDiscoverySet)[0]
+            me.address = me.ipv4
+            fathom.tools.remoteapi.start(function startRemote(node,done) {
+              console.log('started remoteapi!')
+              discoveryDone = false
+              fathom.tools.remoteapi.discovery(function discoverRemote(node,done) {
+                if (Object.keys(node).length > 0) {
+                  deviceSet.add(node)
+                }
+                console.log('started discovery')
+                console.log('node',node)
+                if (done) {
+                  console.log("discovered everything")
+                  var allNodes = Array.from(deviceSet)
+                  console.log('allNodes',allNodes)
+                  // TODO: Count how many nodes there are. For each execute a ping.
+                  // Maybe I have to use some advanced closure magic for that. 
+                  // Display everything in a fancy graph. 
+                  // Do other measurements, ask the router, do correlations.
+                  // Tell the user what the problem is. 
+                  var thingsToDo = [['system.doPing', ["www.google.com", {count : 5}]], ['system.doTraceroute', ["www.google.com"]]]
+                  var eachCounter = new Array(thingsToDo.length).fill(null).map(function(item) {return 0})
+                  var resultsArray = new Array(thingsToDo.length).fill(null).map(function(item) {return []})
+                  console.log('eachCounter', JSON.stringify(eachCounter))
+                  console.log('resultsArray', JSON.stringify(resultsArray))
+                  thingsToDo.forEach(function(args,index) {
+                    console.log('argsForEachThing',JSON.stringify(args))
+                    console.log('indexForEachThing',JSON.stringify(index))
+                    // console.log('args', args)
+                    // console.log('method', method)
+                    // console.log('params', params)
+                    // var timer = index*1000
+                    var timer = 0
+                    console.log('timer', JSON.stringify(timer))
+                    // if (index === 0) {
+                    //   return
+                    // }
+                    setTimeout(function(){
+                      allNodes.forEach(function(currentNode) {
+                        console.log('argsForEachNode',JSON.stringify(args))
+                        console.log('indexForEachNode',JSON.stringify(index))
+                        fathom.tools.remoteapi.makereq(function gotResponse(fullResult, done) {
+                          if (done && fullResult.timeout) {
+                            console.log("Connection terminated by remote host")
+                            return
+                          }
+                          // if (args[0] !== 'system.doTraceroute' && index !== 0) {
+                          //   return
+                          // }
+                          console.log('currentNode', JSON.stringify(currentNode))
+                          console.log("index", JSON.stringify(index))
+                          console.log("allNodes.indexOf(currentNode)", JSON.stringify(allNodes.indexOf(currentNode)))
+                          console.log('method', JSON.stringify(args[0]))
+                          console.log('params', JSON.stringify(args[1]))
+                          resultsArray[index][allNodes.indexOf(currentNode)] = fullResult
+                          console.log('resultsArray', JSON.stringify(resultsArray))
+                          if(!done) {
+                            eachCounter[index] += 1
+                          }
+                          console.log('eachCounter',JSON.stringify(eachCounter))
+                          // console.log(res)
+                          // console.log(done)
+                          // console.log("currentNode", currentNode)
+                          if (eachCounter[index] == allNodes.length) {
+                            createTable(resultsArray[index],args[0])
+                            console.log("Asked every node for index", index)
+                          }                               // timeout of 100s
+                        }, currentNode, args[0], args[1], 100)
+                      })
+                    },timer)
+                  })
+                }
+              }, 1/*s*/)
+            })
+          }
+        }, ['local'])
+      }, manifest)
+    }
+
+    doFathomThings()
 
   </script>
 </body>
@@ -93,22 +213,22 @@
 
 <!-- 
     protoapi.exec(function(res) {
-  console.log(res);
-  assert.ok(res.error === undefined, "jsonrpc.makereq no error");
-  assert.ok(res.result === "pong", "jsonrpc.makereq got pong");
+  console.log(res)
+  assert.ok(res.error === undefined, "jsonrpc.makereq no error")
+  assert.ok(res.result === "pong", "jsonrpc.makereq got pong")
 
   protoapi.exec(function(res) {
       assert.ok(res.error === undefined, 
-          "jsonrpc.close no error");
-      done();
+          "jsonrpc.close no error")
+      done()
 
   }, { module : "proto", 
        submodule: "jsonrpc", 
        method : 'close', 
-       params : [id]}, manifest);
+       params : [id]}, manifest)
 
     }, { module : "proto", 
    submodule: "jsonrpc", 
    method : 'makereq', 
-   params : [id,"ping"]}, manifest);
+   params : [id,"ping"]}, manifest)
  -->
