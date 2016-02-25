@@ -126,8 +126,10 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
         if (e === NSPR.errors.PR_IO_TIMEOUT_ERROR) {
             return {error : "Request timeout", timeout : true};
         } else {
-            console.error("in udp.js, Error receiving: ", NSPR.errors.PR_GetError())
-            console.error("All errors available: ", NSPR.errors)
+            console.info('the weird error occurred!')
+            console.warn('the weird error occurred!')
+            console.warn("in udp.js, Error receiving: ", NSPR.errors.PR_GetError())
+            console.warn("All errors available: ", NSPR.errors)
             return {error : "in udp.js: Error receiving: " + e};
         }
     } else if (res === 0) {
