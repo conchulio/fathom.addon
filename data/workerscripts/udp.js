@@ -128,7 +128,7 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
         } else {
             console.error("in udp.js, Error receiving: ", NSPR.errors.PR_GetError())
             console.error("All errors available: ", NSPR.errors)
-            return {error : "Error receiving: " + e};
+            return {error : "in udp.js: Error receiving: " + e};
         }
     } else if (res === 0) {
         return {error : "Network connection is closed"}; 

@@ -108,7 +108,7 @@ socket.recv = function(s, asstring, timeout, size) {
         } else {
             console.error("in socket.js, Error receiving: ", NSPR.errors.PR_GetError())
             console.error("All errors available: ", NSPR.errors)
-            return {error : "Error receiving: " + NSPR.errors.PR_GetError()};
+            return {error : "in socket.js: Error receiving: " + NSPR.errors.PR_GetError()};
         }
     } else if (res === 0) {
         return {error : "Network connection is closed"}; 
