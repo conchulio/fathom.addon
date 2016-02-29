@@ -116,10 +116,10 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
     var argumentsObject = [
         // typeof(s) === 'undefined'?'undefined':JSON.parse(JSON.stringify(s)), 
         s, 
-        typeof(recvbuf) === 'undefined'?'undefined':JSON.parse(JSON.stringify(recvbuf)), 
+        recvbuf, 
         typeof(bufsize) === 'undefined'?'undefined':JSON.parse(JSON.stringify(bufsize)), 
         typeof(0) === 'undefined'?'undefined':JSON.parse(JSON.stringify(0)), 
-        typeof(addr.address()) === 'undefined'?'undefined':JSON.parse(JSON.stringify(addr.address())), 
+        addr.address(), 
         typeof(to) === 'undefined'?'undefined':JSON.parse(JSON.stringify(to))
     ];
     // } catch (e) {
