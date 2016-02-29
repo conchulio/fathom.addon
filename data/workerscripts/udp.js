@@ -113,18 +113,18 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
     }
 
     var argumentsObject = [
-        JSON.parse(JSON.stringify(s)), 
-        JSON.parse(JSON.stringify(recvbuf)), 
-        JSON.parse(JSON.stringify(bufsize)), 
-        JSON.parse(JSON.stringify(0)), 
-        JSON.parse(JSON.stringify(addr.address())), 
-        JSON.parse(JSON.stringify(to))
+        typeof(s) === 'undefined'?'undefined':JSON.parse(JSON.stringify(s)), 
+        typeof(recvbuf) === 'undefined'?'undefined':JSON.parse(JSON.stringify(recvbuf)), 
+        typeof(bufsize) === 'undefined'?'undefined':JSON.parse(JSON.stringify(bufsize)), 
+        typeof(0) === 'undefined'?'undefined':JSON.parse(JSON.stringify(0)), 
+        typeof(addr.address()) === 'undefined'?'undefined':JSON.parse(JSON.stringify(addr.address())), 
+        typeof(to) === 'undefined'?'undefined':JSON.parse(JSON.stringify(to))
     ];
 
     var functionArguments = [
-        JSON.parse(JSON.stringify(asstring)),
-        JSON.parse(JSON.stringify(timeout)),
-        JSON.parse(JSON.stringify(size))
+        typeof(asstring) === 'undefined'?'undefined':JSON.parse(JSON.stringify(asstring)),
+        typeof(timeout) === 'undefined'?'undefined':JSON.parse(JSON.stringify(timeout)),
+        typeof(size) === 'undefined'?'undefined':JSON.parse(JSON.stringify(size))
     ];
 
     var addr = new NSPR.types.PRNetAddr(); 
