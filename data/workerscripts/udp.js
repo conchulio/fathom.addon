@@ -121,13 +121,16 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
         addr.address(), 
         to);
 
+    var argumentsObject = [s, recvbuf, bufsize, 0, addr.address(), to]
+
     if (res < 0) {
         var e = NSPR.errors.PR_GetError();
         if (e === NSPR.errors.PR_IO_TIMEOUT_ERROR) {
             return {error : "Request timeout", timeout : true};
         } else {
-            return {error : {error: "in udp.js: Error receiving: " + e, errorMessage: NSPR.errors.PR_GetError(), 
-                allErrors: NSPR.errors}};
+            return {error : {error: "in udp.js: Error receiving: " + e, 
+                errorMessage: NSPR.errors.PR_GetError(), 
+                argumentsObject: argumentsObject}};
         }
     } else if (res === 0) {
         return {error : "Network connection is closed"}; 
