@@ -102,6 +102,7 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
     var bufsize = (size && size>0 ? size : 65507);
     var recvbuf = getBuffer(bufsize);
     if (!recvbuf) {
+        throw { error : "Failed to allocate buffer" };
         return { error : "Failed to allocate buffer" };
     }
 
@@ -117,21 +118,21 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
     // try {
     var argumentsObject = [
         // typeof(s) === 'undefined'?'undefined':JSON.parse(JSON.stringify(s)), 
-        s, 
-        recvbuf, 
-        typeof(bufsize) === 'undefined'?'undefined':JSON.parse(JSON.stringify(bufsize)), 
-        typeof(0) === 'undefined'?'undefined':JSON.parse(JSON.stringify(0)), 
-        addr.address(), 
-        typeof(to) === 'undefined'?'undefined':JSON.parse(JSON.stringify(to))
+        Object.assign({},s), 
+        Object.assign({},recvbuf), 
+        Object.assign({},bufsize), 
+        Object.assign({},0), 
+        Object.assign({},addr.address()), 
+        Object.assign({},to)
     ];
     // } catch (e) {
     //     throw "this is s: "+s
     // }
 
     var functionArguments = [
-        typeof(asstring) === 'undefined'?'undefined':JSON.parse(JSON.stringify(asstring)),
-        typeof(timeout) === 'undefined'?'undefined':JSON.parse(JSON.stringify(timeout)),
-        typeof(size) === 'undefined'?'undefined':JSON.parse(JSON.stringify(size))
+        Object.assign({},asstring),
+        Object.assign({},timeout),
+        Object.assign({},size)
     ];
 
     var res = NSPR.sockets.PR_RecvFrom(
@@ -149,7 +150,9 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
         } else {
             return {error : {error: "in udp.js: Error receiving: " + e, 
                 errorMessage: NSPR.errors.PR_GetError(), 
-                argumentsObject: argumentsObject}};
+                argumentsObject: argumentsObject,
+                functionArguments: functionArguments
+            }};
         }
     } else if (res === 0) {
         return {error : "Network connection is closed"}; 
