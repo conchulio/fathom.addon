@@ -112,6 +112,8 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
         to = NSPR.util.PR_MillisecondsToInterval(timeout);
     }
 
+    var addr = new NSPR.types.PRNetAddr(); 
+
     // try {
     var argumentsObject = [
         // typeof(s) === 'undefined'?'undefined':JSON.parse(JSON.stringify(s)), 
@@ -119,7 +121,7 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
         recvbuf, 
         typeof(bufsize) === 'undefined'?'undefined':JSON.parse(JSON.stringify(bufsize)), 
         typeof(0) === 'undefined'?'undefined':JSON.parse(JSON.stringify(0)), 
-        addr.address(), 
+        typeof(addr.address()) === 'undefined'?'undefined':JSON.parse(JSON.stringify(addr.address())), 
         typeof(to) === 'undefined'?'undefined':JSON.parse(JSON.stringify(to))
     ];
     // } catch (e) {
@@ -132,7 +134,6 @@ socket.udpRecvFrom = function(s, asstring, timeout, size) {
         typeof(size) === 'undefined'?'undefined':JSON.parse(JSON.stringify(size))
     ];
 
-    var addr = new NSPR.types.PRNetAddr(); 
     var res = NSPR.sockets.PR_RecvFrom(
         s, 
         recvbuf, 
