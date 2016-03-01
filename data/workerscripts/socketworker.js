@@ -70,12 +70,22 @@ var getBuffer = function(len) {
 };
 
 var cleanup = function() {
+    dump("Cleaning up\n")
     if (worker.socket && worker.socket !== -1) {
-        NSPR.sockets.PR_Close(worker.socket);
+        var returnValue = NSPR.sockets.PR_Close(worker.socket);
+        dump("Valid socket cleaning up\n")
+        dump(returnValue)
+        dump("\n")
+        if (returnValue === 0) 
+            dump("Success\n")
+        else 
+            dump("Failure\n")
     }
     worker.socket = undefined;
-    if (NSPR.closeLib)
+    if (NSPR.closeLib) {
+        dump("closeLib\n")
         NSPR.closeLib();
+    }
     NSPR = {}    
     close();
 };
