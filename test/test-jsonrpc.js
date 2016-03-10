@@ -155,39 +155,40 @@ exports["testmulticast"] = function(assert, done) {
     };
 
     protoapi.exec(function(id) {
-	assert.ok(id.error === undefined, "jsonrpc.create no error");
+		assert.ok(id.error === undefined, "jsonrpc.create no error");
+		console.log('server error,',id.error);
 
-	protoapi.exec(function(req) {
-	    console.log(req)
-	    assert.ok(req.error === undefined, "jsonrpc.listen no error");
-	    assert.ok(req.method === "ping", "jsonrpc.listen got ping");
+		protoapi.exec(function(req) {
+		    console.log(req)
+		    assert.ok(req.error === undefined, "jsonrpc.listen no error");
+		    assert.ok(req.method === "ping", "jsonrpc.listen got ping");
 
-	    req.result = "pong";
+		    req.result = "pong";
 
-	    protoapi.exec(function(res) {
-			console.log("This is the response:", res);
-			assert.ok(res.error === undefined, "jsonrpc.sendres no error");
+		    protoapi.exec(function(res) {
+				console.log("This is the response:", res);
+				assert.ok(res.error === undefined, "jsonrpc.sendres no error");
 
-			protoapi.exec(function(res) {
-			    assert.ok(res.error === undefined, 
-				      "jsonrpc.close no error");		    
+				protoapi.exec(function(res) {
+				    assert.ok(res.error === undefined, 
+					      "jsonrpc.close no error");		    
 
-			}, { module : "proto", 
-			     submodule: "jsonrpc", 
-			     method : 'close', 
-			     params : [id]}, manifest);
+				}, { module : "proto", 
+				     submodule: "jsonrpc", 
+				     method : 'close', 
+				     params : [id]}, manifest);
 
-	    }, { module : "proto", 
-		 submodule: "jsonrpc", 
-		 method : 'sendres', 
-		 params : [id,req]}, manifest);
+		    }, { module : "proto", 
+			 submodule: "jsonrpc", 
+			 method : 'sendres', 
+			 params : [id,req]}, manifest);
 
-	}, { module : "proto", 
-	     submodule: "jsonrpc", 
-	     method : 'listen', 
-	     params : [id]}, manifest);
+		}, { module : "proto", 
+		     submodule: "jsonrpc", 
+		     method : 'listen', 
+		     params : [id]}, manifest);
 
-	docli();
+		docli();
     }, { module : "proto", 
 	 submodule: "jsonrpc", 
 	 method : 'create', 
