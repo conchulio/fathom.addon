@@ -1570,8 +1570,8 @@ tools.dnsLookup = function(callback, hostname, server, port) {
 tools.discovery = function(callback, protocols, timeout) {
     makereq(callback, "tools", "discovery", [protocols, timeout]);
 };
-console.warn("Warning: discovery available to anyone!");
-tools.discovery.addononly = false;
+// console.warn("Warning: discovery available to anyone!");
+// tools.discovery.addononly = false;
 // tools.discovery.addononly = true;
 
 /**
