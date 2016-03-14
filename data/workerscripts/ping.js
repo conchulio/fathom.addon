@@ -60,6 +60,7 @@
     var reporter = function() {
         var reports = [];// raw reports
         var times = [];  // rtts
+        var timesWithIndex = {};
         var upj = [];    // uplink jitter
         var downj = [];  // downlink jitter
         
@@ -88,6 +89,7 @@
             if (s) {
                 succ += 1;
                 times.push(r.time); // rtt
+                timesWithIndex[succ+fail] = r.time;
 
                 if (r.r) {
                     // we have server timestamp
@@ -213,6 +215,7 @@
                         succrate : (succ*100.0) / sent,
                     },
                     rtt : stats(times),
+                    rttWithIndex: stats(timesWithIndex),
                     upjitter : stats(upj),
                     downjitter : stats(downj),
                     updv : stats(updv),
