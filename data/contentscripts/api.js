@@ -1570,7 +1570,7 @@ tools.dnsLookup = function(callback, hostname, server, port) {
 tools.discovery = function(callback, protocols, timeout) {
     makereq(callback, "tools", "discovery", [protocols, timeout]);
 };
-tools.discovery.addononly = true;
+tools.discovery.addononly = false;
 
 /**
  * @description Resolve the nearest Mlab server.
@@ -1591,7 +1591,7 @@ tools.getMlabServer = function(callback) {
  * @access private
  * @exports fathom/tools/remoteapi
  */
-var remoteapi = tools.remoteapi = { addononly : true };
+var remoteapi = tools.remoteapi = { addononly : false };
 
 /**
  * @description Start remote API servers (sets the browser visible to other 

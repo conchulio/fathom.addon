@@ -166,7 +166,7 @@
       "type": "bool",
       "title": "Enable Fathom API for Regular Web Pages",
       "description": "Enable Fathom APIs for any regular web page. Fathom will always ask your approval everytime before a page can access any of the Fathom features. Only allow pages you trust to access the Fathom API!",
-      "value": false
+      "value": true
     }
   ]
 }
